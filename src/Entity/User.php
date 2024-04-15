@@ -10,8 +10,10 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -26,6 +28,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Delete(),
     ]
 )]
+#[ApiFilter(DateFilter::class, properties: ['dateOfBirth'])]
 class User
 {
     #[ORM\Id]
@@ -42,6 +45,9 @@ class User
     #[Assert\LessThan('-150 years')]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $dateOfBirth = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $lastname = null;
 
     public function getId(): ?int
     {
@@ -80,6 +86,18 @@ class User
     public function setDateOfBirth(\DateTimeInterface $dateOfBirth): static
     {
         $this->dateOfBirth = $dateOfBirth;
+
+        return $this;
+    }
+
+    public function getLastname(): ?string
+    {
+        return $this->lastname;
+    }
+
+    public function setLastname(string $lastname): static
+    {
+        $this->lastname = $lastname;
 
         return $this;
     }
