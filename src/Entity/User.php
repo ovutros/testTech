@@ -14,6 +14,7 @@ use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -29,6 +30,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     ]
 )]
 #[ApiFilter(DateFilter::class, properties: ['dateOfBirth'])]
+#[ApiFilter(OrderFilter::class, properties: ['firstname' => 'ASC'])]
 class User
 {
     #[ORM\Id]
@@ -37,7 +39,12 @@ class User
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $firstnam = null;    
+    #[Assert\NotBlank]
+    private ?string $firstname = null;
+    
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    private ?string $lastname = null;   
 
     #[ORM\ManyToOne(inversedBy: 'users')]
     private ?Jobs $jobs = null;
@@ -46,9 +53,6 @@ class User
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $dateOfBirth = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $lastname = null;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -56,12 +60,12 @@ class User
 
     public function getFirstnam(): ?string
     {
-        return $this->firstnam;
+        return $this->firstname;
     }
 
-    public function setFirstnam(string $firstnam): static
+    public function setFirstnam(string $firstname): static
     {
-        $this->firstnam = $firstnam;
+        $this->firstname = $firstname;
 
         return $this;
     }  
