@@ -15,60 +15,47 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[ApiResource(
-    operations: [
-        new Get(),
-        new GetCollection(),
-        new Post(),
-        new Put(),
-        new Patch(),
-        new Delete(),
-    ]
+   normalizationContext:['groups'=>['read']],
+   denormalizationContext:['groups'=>['write']],
 )]
-#[ApiFilter(DateFilter::class, properties: ['dateOfBirth'])]
-#[ApiFilter(OrderFilter::class, properties: ['firstname' => 'ASC'])]
+
 class User
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['read', 'write'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[Groups(['read', 'write'])]
     private ?string $firstname = null;
     
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[Groups(['read', 'write'])]
     private ?string $lastname = null;   
 
     #[ORM\ManyToOne(inversedBy: 'users')]
+    #[Groups(['read', 'write'])]
     private ?Jobs $jobs = null;
 
     #[Assert\LessThan('-150 years')]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['read', 'write'])]
     private ?\DateTimeInterface $dateOfBirth = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
-
-    public function getFirstnam(): ?string
-    {
-        return $this->firstname;
-    }
-
-    public function setFirstnam(string $firstname): static
-    {
-        $this->firstname = $firstname;
-
-        return $this;
-    }  
 
     public function getJobs(): ?Jobs
     {
@@ -102,6 +89,26 @@ class User
     public function setLastname(string $lastname): static
     {
         $this->lastname = $lastname;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of firstname
+     */ 
+    public function getFirstname()
+    {
+        return $this->firstname;
+    }
+
+    /**
+     * Set the value of firstname
+     *
+     * @return  self
+     */ 
+    public function setFirstname($firstname)
+    {
+        $this->firstname = $firstname;
 
         return $this;
     }
